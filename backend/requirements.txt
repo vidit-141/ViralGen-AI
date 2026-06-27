@@ -5,3 +5,5 @@ redis
 motor
 python-dotenv
 pydantic-settings
+groq
+slowapi
