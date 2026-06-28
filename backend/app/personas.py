@@ -41,14 +41,26 @@ PERSONAS = {
 PLATFORMS = {
     "linkedin": {
         "name": "LinkedIn",
-        "instruction": "Write a LinkedIn post. 3-4 short paragraphs, professional hook, end with a question or CTA. Max 250 words."
+        "instruction": (
+            "Write a LinkedIn post. Start with a bold hook sentence that stops the scroll. "
+            "Follow with 2-3 short paragraphs — one problem, one solution, one insight. "
+            "End with a question to drive comments. No hashtags. Max 200 words."
+        )
     },
     "instagram": {
         "name": "Instagram",
-        "instruction": "Write an Instagram caption. Punchy first line (hook), 2-3 short lines, relevant hashtags at the end. Max 80 words."
+        "instruction": (
+            "Write an Instagram caption. First line must be a scroll-stopping hook (no intro). "
+            "Keep the body to 2-3 punchy lines. Add 5-7 relevant hashtags on a new line at the end. "
+            "Max 80 words excluding hashtags."
+        )
     },
     "twitter": {
         "name": "Twitter / X",
-        "instruction": "Write a tweet. Max 240 characters. One strong idea, no fluff. Hook immediately."
+        "instruction": (
+            "Write a single tweet. Max 240 characters total. "
+            "One sharp idea, no fluff, no hashtags unless essential. "
+            "Hook in the first 5 words. Make it quotable."
+        )
     }
 }
