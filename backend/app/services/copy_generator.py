@@ -1,4 +1,5 @@
 from app.services.groq_client import chat
+from app.services.prompt_refiner import refine_prompt
 from app.personas import PERSONAS, PLATFORMS
 from app.utils import sanitize_brief
 
@@ -25,10 +26,12 @@ def generate_copy(brief: str, persona: str, platform: str) -> dict:
     user_message = f"Write marketing copy for the following:\n\n{clean_brief}"
 
     copy = chat(system_prompt=system_prompt, user_message=user_message)
+    refined = refine_prompt(clean_brief)
 
     return {
         "copy": copy,
         "persona": persona,
         "platform": platform,
         "tone": persona_config["tone_hint"]
+        "refined_image_prompt": refined["refined_prompt"]
     }
