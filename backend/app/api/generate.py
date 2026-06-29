@@ -14,6 +14,7 @@ class CopyResponse(BaseModel):
     persona: str
     platform: str
     tone: str
+    refined_image_prompt: str
 
 @router.post("/copy", response_model=CopyResponse)
 def copy_endpoint(req: CopyRequest):
