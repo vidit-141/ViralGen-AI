@@ -32,6 +32,6 @@ def generate_copy(brief: str, persona: str, platform: str) -> dict:
         "copy": copy,
         "persona": persona,
         "platform": platform,
-        "tone": persona_config["tone_hint"]
+        "tone": persona_config["tone_hint"],
         "refined_image_prompt": refined["refined_prompt"]
     }
