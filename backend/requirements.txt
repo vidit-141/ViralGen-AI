@@ -7,3 +7,5 @@ python-dotenv
 pydantic-settings
 groq
 slowapi
+requests
+pillow
