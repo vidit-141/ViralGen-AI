@@ -1,6 +1,8 @@
 import requests
 import uuid
 import os
+import time
+import base64
 from app.config import settings
 
 STATIC_DIR = "static/images"
@@ -18,7 +20,7 @@ def generate_image(prompt: str, negative_prompt: str = "") -> dict:
     body = {
         "text_prompts": [
             {"text": prompt, "weight": 1.0},
-            {"text": negative_prompt or "blurry, low quality, distorted, watermark", "weight": -1.0}
+            {"text": negative_prompt or "blurry, low quality, distorted, watermarktext, logo", "weight": -1.0}
         ],
         "cfg_scale": 7,
         "height": 1024,
@@ -27,23 +29,37 @@ def generate_image(prompt: str, negative_prompt: str = "") -> dict:
         "samples": 1
     }
 
-    response = requests.post(url, headers=headers, json=body)
+    last_error = None
+    for attempt in range(settings.stability_max_retries):
+        try:
+            response = requests.post(url, headers=headers, json=body, timeout=60)
 
-    if response.status_code != 200:
-        raise Exception(f"Stability API error: {response.text}")
+            if response.status_code == 429:
+                wait = settings.stability_retry_delay * (attempt + 1)
+                time.sleep(wait)
+                continue
 
-    data = response.json()
-    image_b64 = data["artifacts"][0]["base64"]
+            if response.status_code != 200:
+                raise Exception(f"Stability API error {response.status_code}: {response.text}")
 
-    import base64
-    filename = f"{uuid.uuid4()}.png"
-    filepath = os.path.join(STATIC_DIR, filename)
+            data = response.json()
+            image_b64 = data["artifacts"][0]["base64"]
 
-    with open(filepath, "wb") as f:
-        f.write(base64.b64decode(image_b64))
+            filename = f"{uuid.uuid4()}.png"
+            filepath = os.path.join(STATIC_DIR, filename)
 
-    return {
-        "filename": filename,
-        "filepath": filepath,
-        "image_url": f"/static/images/{filename}"
-    }
+            with open(filepath, "wb") as f:
+                f.write(base64.b64decode(image_b64))
+
+            return {
+                "filename": filename,
+                "filepath": filepath,
+                "image_url": f"/static/images/{filename}"
+            }
+
+        except Exception as e:
+            last_error = e
+            if attempt < settings.stability_max_retries - 1:
+                time.sleep(settings.stability_retry_delay)
+
+    raise Exception(f"Image generation failed after {settings.stability_max_retries} attempts: {last_error}")
