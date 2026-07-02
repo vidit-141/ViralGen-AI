@@ -8,7 +8,7 @@ from app.api.health import router as health_router
 from app.api.generate import router as generate_router
 from app.api.refine import router as refine_router
 from app.api.image import router as image_router
-
+from app.api.asset import router as asset_router
 
 app = FastAPI(title="ViralGen AI")
 
@@ -28,3 +28,4 @@ app.include_router(health_router)
 app.include_router(generate_router)
 app.include_router(refine_router)
 app.include_router(image_router)
+app.include_router(asset_router)
