@@ -18,6 +18,8 @@ class AssetResponse(BaseModel):
     tone: str
     image_url: str
     filename: str
+    composite_url: str
+    composite_filename: str
 
 @router.post("/asset", response_model=AssetResponse)
 def asset_endpoint(req: AssetRequest):
