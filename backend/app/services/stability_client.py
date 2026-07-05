@@ -18,15 +18,22 @@ def generate_image(prompt: str, negative_prompt: str = "") -> dict:
     }
 
     body = {
-        "text_prompts": [
-            {"text": prompt, "weight": 1.0},
-            {"text": negative_prompt or "blurry, low quality, distorted, watermarktext, logo", "weight": -1.0}
-        ],
-        "cfg_scale": 7,
-        "height": 1024,
-        "width": 1024,
-        "steps": 30,
-        "samples": 1
+    "text_prompts": [
+        {"text": prompt, "weight": 1.0},
+        {
+            "text": negative_prompt or (
+                "blurry, low quality, distorted, watermark, text, logo, "
+                "oversaturated, ugly, deformed, bad anatomy, cropped, "
+                "worst quality, jpeg artifacts, duplicate"
+            ),
+            "weight": -1.0
+        }
+    ],
+    "cfg_scale": 7,
+    "height": 1024,
+    "width": 1024,
+    "steps": 30,
+    "samples": 1
     }
 
     last_error = None
