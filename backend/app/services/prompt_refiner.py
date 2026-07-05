@@ -13,6 +13,8 @@ Rules:
 - End with: professional product photography, highly detailed, 8k resolution
 - Output ONLY the image prompt. No explanations, no labels, no preamble.
 - Keep it under 200 words.
+- Never include text, logos, brand names, or typography in the prompt
+- Focus on the product itself, lighting, and environment only
 
 Examples:
 Brief: "gym earbuds"
