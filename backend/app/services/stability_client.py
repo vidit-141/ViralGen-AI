@@ -22,9 +22,11 @@ def generate_image(prompt: str, negative_prompt: str = "") -> dict:
         {"text": prompt, "weight": 1.0},
         {
             "text": negative_prompt or (
-                "blurry, low quality, distorted, watermark, text, logo, "
+                "blurry, low quality, distorted, watermark, text, logo, brand name, "
+                "letters, words, signs, labels, stickers, typography, "
                 "oversaturated, ugly, deformed, bad anatomy, cropped, "
-                "worst quality, jpeg artifacts, duplicate"
+                "worst quality, jpeg artifacts, duplicate, extra limbs, "
+                "poorly drawn, mutation, out of frame"
             ),
             "weight": -1.0
         }
