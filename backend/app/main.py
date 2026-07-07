@@ -10,6 +10,7 @@ from app.api.refine import router as refine_router
 from app.api.image import router as image_router
 from app.api.asset import router as asset_router
 from app.api.tasks import router as tasks_router
+from app.api.async_asset import router as async_asset_router
 
 app = FastAPI(title="ViralGen AI")
 
@@ -31,3 +32,4 @@ app.include_router(refine_router)
 app.include_router(image_router)
 app.include_router(asset_router)
 app.include_router(tasks_router)
+app.include_router(async_asset_router)
