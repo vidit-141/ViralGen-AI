@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from app.celery_app import celery
 from app.tasks import test_task
 from celery.result import AsyncResult
@@ -24,16 +24,21 @@ def get_task_status(task_id: str):
 
     if result.state == "PENDING":
         response["message"] = "Task is waiting to be processed"
+        response["progress"] = 0
 
     elif result.state == "STARTED":
-        response["message"] = "Task is currently running"
+        meta = result.info or {}
+        response["message"] = meta.get("step", "Processing...")
+        response["progress"] = meta.get("progress", 0)
 
     elif result.state == "SUCCESS":
-        response["message"] = "Task completed successfully"
+        response["message"] = "Asset ready"
+        response["progress"] = 100
         response["result"] = result.get()
 
     elif result.state == "FAILURE":
-        response["message"] = "Task failed"
+        response["message"] = "Generation failed"
+        response["progress"] = 0
         response["error"] = str(result.info)
 
     return response
