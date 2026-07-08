@@ -16,12 +16,18 @@ export interface AssetResponse {
   composite_filename: string;
 }
 
-export async function generateAsset(
+export interface AsyncJobResponse {
+  job_id: string;
+  status: string;
+  message: string;
+}
+
+export async function generateAssetAsync(
   brief: string,
   persona: Persona,
   platform: Platform
-): Promise<AssetResponse> {
-  const res = await fetch(`${API_BASE}/generate/asset`, {
+): Promise<AsyncJobResponse> {
+  const res = await fetch(`${API_BASE}/generate/asset/async`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ brief, persona, platform }),
@@ -29,7 +35,7 @@ export async function generateAsset(
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.detail || "Generation failed");
+    throw new Error(err.detail || "Failed to start generation");
   }
 
   return res.json();
