@@ -14,4 +14,7 @@ celery.conf.update(
     result_serializer="json",
     accept_content=["json"],
     result_expires=3600,
+    broker_pool_limit=10,
+    redis_max_connections=20,
+    worker_prefetch_multiplier=1,
 )
