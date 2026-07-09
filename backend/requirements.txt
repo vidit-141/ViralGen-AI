@@ -9,3 +9,4 @@ groq
 slowapi
 requests
 pillow
+aiohttp
