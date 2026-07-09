@@ -1,3 +1,5 @@
+import time
+import random
 from app.celery_app import celery
 from celery import states
 from celery.exceptions import Ignore
@@ -6,9 +8,18 @@ from celery.exceptions import Ignore
 def test_task(self, a: int, b: int) -> dict:
     return {"result": a + b, "task_id": self.request.id}
 
-@celery.task(bind=True, name="tasks.generate_asset_task")
+@celery.task(
+    bind=True,
+    name="tasks.generate_asset_task",
+    time_limit=120,
+    soft_time_limit=100
+)
 def generate_asset_task(self, brief: str, persona: str, platform: str) -> dict:
     try:
+        # stagger concurrent tasks to avoid Groq rate limits
+        jitter = random.uniform(0, 3)
+        time.sleep(jitter)
+
         self.update_state(
             state="STARTED",
             meta={"step": "Refining prompt...", "progress": 10}
