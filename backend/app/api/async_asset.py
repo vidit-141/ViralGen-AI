@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.tasks import generate_asset_task
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/generate", tags=["generate"])
 
 class AsyncAssetRequest(BaseModel):
@@ -15,7 +18,8 @@ class AsyncAssetResponse(BaseModel):
     message: str
 
 @router.post("/asset/async", response_model=AsyncAssetResponse)
-def async_asset_endpoint(req: AsyncAssetRequest):
+@limiter.limit("10/minute")
+def async_asset_endpoint(request: Request, req: AsyncAssetRequest):
     try:
         task = generate_asset_task.delay(
             brief=req.brief,

@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from app.services.copy_generator import generate_copy
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/generate", tags=["generate"])
 
 class CopyRequest(BaseModel):
@@ -17,7 +20,8 @@ class CopyResponse(BaseModel):
     refined_image_prompt: str
 
 @router.post("/copy", response_model=CopyResponse)
-def copy_endpoint(req: CopyRequest):
+@limiter.limit("20/minute")
+def copy_endpoint(request: Request, req: CopyRequest):
     try:
         result = generate_copy(
             brief=req.brief,
