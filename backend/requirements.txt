@@ -10,3 +10,6 @@ slowapi
 requests
 pillow
 aiohttp
+billiard
+motor
+pymongo
