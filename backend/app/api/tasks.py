@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.celery_app import celery
 from app.tasks import test_task
+from app.services.history import save_generation
 from celery.result import AsyncResult
 
 router = APIRouter(prefix="/task", tags=["tasks"])
@@ -14,7 +15,7 @@ def trigger_test_task():
     }
 
 @router.get("/{task_id}/status")
-def get_task_status(task_id: str):
+async def get_task_status(task_id: str):
     result: AsyncResult = celery.AsyncResult(task_id)
 
     response = {
@@ -32,9 +33,14 @@ def get_task_status(task_id: str):
         response["progress"] = meta.get("progress", 0)
 
     elif result.state == "SUCCESS":
+        task_result = result.get()
         response["message"] = "Asset ready"
         response["progress"] = 100
-        response["result"] = result.get()
+        response["result"] = task_result
+
+        if not task_result.get("saved_to_db"):
+            await save_generation(task_result)
+            task_result["saved_to_db"] = True
 
     elif result.state == "FAILURE":
         response["message"] = "Generation failed"
