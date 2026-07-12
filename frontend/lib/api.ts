@@ -14,12 +14,24 @@ export interface AssetResponse {
   filename: string;
   composite_url: string;
   composite_filename: string;
+  saved_to_db?: boolean;
 }
 
 export interface AsyncJobResponse {
   job_id: string;
   status: string;
   message: string;
+}
+
+export interface HistoryItem {
+  id: string;
+  original_brief: string;
+  copy: string;
+  persona: string;
+  platform: string;
+  composite_url: string;
+  image_url: string;
+  created_at: string;
 }
 
 export async function generateAssetAsync(
@@ -39,4 +51,11 @@ export async function generateAssetAsync(
   }
 
   return res.json();
+}
+
+export async function fetchHistory(limit = 20): Promise<HistoryItem[]> {
+  const res = await fetch(`${API_BASE}/history/?limit=${limit}`);
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.items || [];
 }
