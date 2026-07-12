@@ -12,7 +12,7 @@ export interface JobState {
   error: string | null;
 }
 
-export function useJobPoller() {
+export function useJobPoller(onSuccess?: () => void) {
   const [jobState, setJobState] = useState<JobState>({
     status: "idle",
     progress: 0,
@@ -22,7 +22,6 @@ export function useJobPoller() {
   });
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const jobIdRef = useRef<string | null>(null);
 
   const stopPolling = () => {
     if (intervalRef.current) {
@@ -32,7 +31,6 @@ export function useJobPoller() {
   };
 
   const startPolling = (jobId: string) => {
-    jobIdRef.current = jobId;
     stopPolling();
 
     setJobState({
@@ -57,6 +55,7 @@ export function useJobPoller() {
             result: data.result,
             error: null,
           });
+          onSuccess?.();
         } else if (data.status === "FAILURE") {
           stopPolling();
           setJobState({
