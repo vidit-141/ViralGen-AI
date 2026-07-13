@@ -2,11 +2,41 @@
 
 import { Persona } from "@/lib/api";
 
-const PERSONAS: { value: Persona; label: string; desc: string; accent: string }[] = [
-  { value: "professional", label: "Professional", desc: "Polished & credible", accent: "border-blue-500 bg-blue-500/10" },
-  { value: "witty", label: "Witty", desc: "Clever & memorable", accent: "border-purple-500 bg-purple-500/10" },
-  { value: "urgent", label: "Urgent", desc: "Action-driven", accent: "border-orange-500 bg-orange-500/10" },
-  { value: "playful", label: "Playful", desc: "Fun & relatable", accent: "border-pink-500 bg-pink-500/10" },
+const PERSONAS: {
+  value: Persona;
+  label: string;
+  desc: string;
+  gradient: string;
+  active: string;
+}[] = [
+  {
+    value: "professional",
+    label: "Professional",
+    desc: "Polished & credible",
+    gradient: "from-blue-600/20 to-blue-500/5",
+    active: "border-blue-500 shadow-blue-500/20 shadow-lg",
+  },
+  {
+    value: "witty",
+    label: "Witty",
+    desc: "Clever & memorable",
+    gradient: "from-violet-600/20 to-violet-500/5",
+    active: "border-violet-500 shadow-violet-500/20 shadow-lg",
+  },
+  {
+    value: "urgent",
+    label: "Urgent",
+    desc: "Action-driven",
+    gradient: "from-orange-600/20 to-orange-500/5",
+    active: "border-orange-500 shadow-orange-500/20 shadow-lg",
+  },
+  {
+    value: "playful",
+    label: "Playful",
+    desc: "Fun & relatable",
+    gradient: "from-pink-600/20 to-pink-500/5",
+    active: "border-pink-500 shadow-pink-500/20 shadow-lg",
+  },
 ];
 
 export default function PersonaSelector({
@@ -17,17 +47,21 @@ export default function PersonaSelector({
   onChange: (p: Persona) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2">
       {PERSONAS.map((p) => (
         <button
           key={p.value}
           onClick={() => onChange(p.value)}
-          className={`text-left p-4 rounded-xl border-2 transition-all ${
-            value === p.value ? p.accent : "border-zinc-800 hover:border-zinc-700"
+          className={`text-left p-3 rounded-xl border transition-all duration-200 bg-gradient-to-br ${
+            p.gradient
+          } ${
+            value === p.value
+              ? `border-opacity-100 ${p.active}`
+              : "border-zinc-800 hover:border-zinc-700"
           }`}
         >
-          <div className="font-medium text-white">{p.label}</div>
-          <div className="text-sm text-zinc-400">{p.desc}</div>
+          <div className="font-medium text-sm text-white">{p.label}</div>
+          <div className="text-xs text-zinc-400 mt-0.5">{p.desc}</div>
         </button>
       ))}
     </div>
