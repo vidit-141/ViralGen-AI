@@ -54,8 +54,20 @@ export async function generateAssetAsync(
 }
 
 export async function fetchHistory(limit = 20): Promise<HistoryItem[]> {
-  const res = await fetch(`${API_BASE}/history/?limit=${limit}`);
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.items || [];
+  try {
+    const res = await fetch(`${API_BASE}/history/?limit=${limit}`);
+    if (!res.ok) return [];
+    
+    const data = await res.json();
+    
+    // SAFE FIX: Handles both { items: [...] } AND direct array responses [...]
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    return data.items || [];
+  } catch (e) {
+    console.warn("History fetch failed:", e);
+    return [];
+  }
 }

@@ -2,68 +2,71 @@
 
 import { JobState } from "@/hooks/useJobPoller";
 
-const STEP_LABELS: Record<string, string> = {
-  "Refining prompt...": "Refining your brief",
+const STEPS = [
+  { label: "Refining", threshold: 10 },
+  { label: "Copywriting", threshold: 30 },
+  { label: "Generating", threshold: 55 },
+  { label: "Compositing", threshold: 85 },
+  { label: "Done", threshold: 100 },
+];
+
+const STEP_MESSAGES: Record<string, string> = {
+  "Refining prompt...": "Refining your brief into an image prompt",
   "Generating copy...": "Writing campaign copy",
-  "Generating image...": "Generating visual",
-  "Compositing final asset...": "Compositing final asset",
-  "Asset ready": "Done",
-  "Queued...": "Queued",
+  "Generating image...": "Generating visual with Stable Diffusion",
+  "Compositing final asset...": "Compositing copy onto image",
+  "Asset ready": "Your asset is ready",
+  "Queued...": "Waiting for worker...",
 };
 
 export default function JobProgressCard({ jobState }: { jobState: JobState }) {
-  const { status, progress, message } = jobState;
-
-  const steps = [
-    { label: "Refining brief", threshold: 10 },
-    { label: "Writing copy", threshold: 30 },
-    { label: "Generating image", threshold: 55 },
-    { label: "Compositing", threshold: 85 },
-    { label: "Done", threshold: 100 },
-  ];
+  const { progress, message } = jobState;
 
   return (
-    <div className="p-5 rounded-xl bg-zinc-900 border border-zinc-800 space-y-5">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-white">
-          {STEP_LABELS[message] || message}
+    <div className="animate-fade-in animate-pulse-glow p-5 rounded-xl bg-zinc-900 border border-violet-500/30 space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse flex-shrink-0" />
+        <span className="text-sm text-zinc-300">
+          {STEP_MESSAGES[message] || message || "Processing..."}
         </span>
-        <span className="text-sm text-zinc-400">{progress}%</span>
+        <span className="ml-auto text-sm font-medium text-violet-400">
+          {progress}%
+        </span>
       </div>
 
-      <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          className="h-full rounded-full transition-all duration-700 ease-out"
           style={{
             width: `${progress}%`,
-            background: "linear-gradient(90deg, #8b5cf6, #06b6d4)",
+            background:
+              "linear-gradient(90deg, #7c3aed, #8b5cf6, #06b6d4)",
           }}
         />
       </div>
 
       <div className="flex justify-between">
-        {steps.map((step, i) => (
-          <div key={i} className="flex flex-col items-center gap-1">
+        {STEPS.map((step, i) => (
+          <div key={i} className="flex flex-col items-center gap-1.5">
             <div
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${
                 progress >= step.threshold
-                  ? "bg-violet-500"
+                  ? "bg-violet-500 scale-125"
                   : "bg-zinc-700"
               }`}
             />
-            <span className="text-xs text-zinc-500 hidden sm:block">
+            <span
+              className={`text-xs transition-colors ${
+                progress >= step.threshold
+                  ? "text-zinc-400"
+                  : "text-zinc-700"
+              }`}
+            >
               {step.label}
             </span>
           </div>
         ))}
       </div>
-
-      {status === "PENDING" || status === "STARTED" ? (
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-          <span className="text-xs text-zinc-400">Processing in background</span>
-        </div>
-      ) : null}
     </div>
   );
 }
