@@ -71,3 +71,22 @@ export async function fetchHistory(limit = 20): Promise<HistoryItem[]> {
     return [];
   }
 }
+
+export async function regenerateCopy(
+  brief: string,
+  persona: Persona,
+  platform: Platform
+): Promise<{ copy: string; persona: string; platform: string; tone: string }> {
+  const res = await fetch(`${API_BASE}/regenerate/copy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brief, persona, platform }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Regeneration failed");
+  }
+
+  return res.json();
+}
