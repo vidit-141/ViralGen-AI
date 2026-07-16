@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { generateAssetAsync, Persona, Platform, HistoryItem } from "@/lib/api";
+import { generateAssetAsync, regenerateCopy, Persona, Platform, HistoryItem } from "@/lib/api";
 import { useJobPoller } from "@/hooks/useJobPoller";
 import PersonaSelector from "@/components/PersonaSelector";
 import PlatformToggle from "@/components/PlatformToggle";
@@ -19,6 +19,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [selectedHistory, setSelectedHistory] = useState<HistoryItem | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+  const [overrideCopy, setOverrideCopy] = useState<string | null>(null);
 
   const { jobState, startPolling, reset } = useJobPoller(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -38,8 +40,9 @@ export default function Home() {
     }
     setError("");
     setSelectedHistory(null);
+    setOverrideCopy(null);  
     reset();
-
+    
     try {
       const job = await generateAssetAsync(brief, persona, platform);
       startPolling(job.job_id);
@@ -62,6 +65,20 @@ export default function Home() {
         refined_image_prompt: "",
       }
     : activeResult;
+
+  const handleRegenerateCopy = async () => {
+  if (!displayResult) return;
+  setRegenerating(true);
+  setOverrideCopy(null);
+  try {
+    const res = await regenerateCopy(brief, persona, platform);
+    setOverrideCopy(res.copy);
+  } catch (e: any) {
+    setError(e.message || "Regeneration failed");
+  } finally {
+    setRegenerating(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-black text-white flex">
@@ -124,7 +141,22 @@ export default function Home() {
                 </div>
               )}
 
-              {displayResult && <CopyOutput text={displayResult.copy} />}
+              {(overrideCopy || (displayResult && displayResult.copy)) && (
+  <div className="space-y-2">
+    <CopyOutput text={overrideCopy || displayResult!.copy} />
+    {displayResult && (
+      <div className="flex gap-2">
+        <button
+          onClick={handleRegenerateCopy}
+          disabled={regenerating}
+          className="flex-1 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-sm text-zinc-300 hover:text-white hover:border-zinc-600 transition-all disabled:opacity-50"
+        >
+          {regenerating ? "Rewriting..." : "Regenerate copy"}
+        </button>
+      </div>
+    )}
+  </div>
+)}
             </div>
 
             <div className="space-y-4">
