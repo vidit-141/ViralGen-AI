@@ -19,6 +19,7 @@ from app.api.asset import router as asset_router
 from app.api.tasks import router as tasks_router
 from app.api.async_asset import router as async_asset_router
 from app.api.history import router as history_router
+from app.api.regenerate import router as regenerate_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -85,4 +86,5 @@ app.include_router(refine_router)
 app.include_router(asset_router)
 app.include_router(tasks_router)
 app.include_router(async_asset_router)
-app.include_router(history_router)
+app.include_router(history_router)  
+app.include_router(regenerate_router)
