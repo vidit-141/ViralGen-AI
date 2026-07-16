@@ -12,12 +12,18 @@ db_instance = Database()
 
 async def connect_db():
     try:
-        db_instance.client = AsyncIOMotorClient(settings.mongodb_uri)
+        db_instance.client = AsyncIOMotorClient(
+            settings.mongodb_uri,
+            serverSelectionTimeoutMS=5000,
+            tls=True,
+            tlsAllowInvalidCertificates=True
+        )
         db_instance.db = db_instance.client.viralgen
         await db_instance.client.admin.command("ping")
         logger.info("MongoDB connected successfully")
     except Exception as e:
-        logger.error(f"MongoDB connection failed: {e}")
+        logger.warning(f"MongoDB unavailable, history will be disabled: {e}")
+        db_instance.db = None
 
 async def close_db():
     if db_instance.client:
