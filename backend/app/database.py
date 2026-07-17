@@ -14,9 +14,12 @@ async def connect_db():
     try:
         db_instance.client = AsyncIOMotorClient(
             settings.mongodb_uri,
-            serverSelectionTimeoutMS=5000,
+            serverSelectionTimeoutMS=10000,
+            connectTimeoutMS=10000,
+            socketTimeoutMS=10000,
             tls=True,
-            tlsAllowInvalidCertificates=True
+            tlsAllowInvalidCertificates=True,
+            retryWrites=True
         )
         db_instance.db = db_instance.client.viralgen
         await db_instance.client.admin.command("ping")
