@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from app.tasks import generate_asset_task
+from app.utils import sanitize_brief
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/generate", tags=["generate"])
@@ -21,8 +22,9 @@ class AsyncAssetResponse(BaseModel):
 @limiter.limit("10/minute")
 def async_asset_endpoint(request: Request, req: AsyncAssetRequest):
     try:
+        clean_brief = sanitize_brief(req.brief)
         task = generate_asset_task.delay(
-            brief=req.brief,
+            brief=clean_brief,
             persona=req.persona,
             platform=req.platform
         )
@@ -31,5 +33,7 @@ def async_asset_endpoint(request: Request, req: AsyncAssetRequest):
             "status": "PENDING",
             "message": "Asset generation started. Poll /task/{job_id}/status for updates."
         }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Generation failed")
